@@ -11,13 +11,17 @@ var cheerio = require("cheerio");
 // The "Image" class.
 function Image(image, address){
 
-	var at = this.attributes = image.attribs;
+	try {
+		var at = this.attributes = image.attribs;
 
-	this.name = path.basename(at.src, path.extname(at.src));
-	this.saveTo = path.dirname(require.main.filename) + "/";
-	this.extension = path.extname(at.src);
-	this.address = url.resolve(address, at.src);
-	this.fromAddress = address;
+		this.name = path.basename(at.src, path.extname(at.src));
+		this.saveTo = path.dirname(require.main.filename) + "/";
+		this.extension = path.extname(at.src);
+		this.address = url.resolve(address, at.src);
+		this.fromAddress = address;
+	} catch(e) {
+		console.error("Image scraper(5): image image item couldn't be built. Error message: ", e, e.stack);
+	}
 }
 
 Image.prototype.save = function(callback){
