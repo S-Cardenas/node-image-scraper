@@ -101,7 +101,13 @@ Scraper.prototype.scrape = function(callback){
 		protocol = https;
 	}
 
-	var request = protocol.request(this.address, function(response){
+	var options = {
+		headers: {
+			'User-Agent': 'javascript'
+		}
+	};
+
+	var request = protocol.request(this.address, options, function(response){
 
 		if(response.statusCode != 200){
 			console.error("Image scraper(1): web page couldn't be found. (statusCode:" + response.statusCode + ")");
