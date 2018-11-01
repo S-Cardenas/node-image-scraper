@@ -106,18 +106,6 @@ Scraper.prototype.scrape = function(callback){
 		'User-Agent': 'javascript'
 	};
 
-	// var options = new URL(this.address);
-
-	// options.headers = {
-	// 	'User-Agent': 'javascript'
-	// };
-
-	// var options = {
-	// 	headers: {
-	// 		'User-Agent': 'javascript'
-	// 	}
-	// };
-
 	var request = protocol.request(parsedUrl, function(response){
 
 		if(response.statusCode != 200){
