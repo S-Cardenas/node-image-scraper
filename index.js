@@ -92,6 +92,9 @@ Scraper.prototype.scrape = function(callback){
 		this.on("image", callback);
 	}
 
+	// Make a reference to the current instance.
+	var ref = this;
+
 	if (this.html && this.address) {
 		// I'm no longer making the http request here. I'll just pass in the full html
 		// that was returned from `puppeteer`.
@@ -106,9 +109,6 @@ Scraper.prototype.scrape = function(callback){
 		ref.emit("end");
 	} else {
 		var parsedUrl = url.parse(this.address);
-
-		// Make a reference to the current instance.
-		var ref = this;
 
 		// Support HTTPS.
 		var protocol = http;
