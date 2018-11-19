@@ -75,10 +75,11 @@ Image.prototype.save = function(callback){
 	});
 };
 
-function Scraper(address){
+function Scraper(address, html){
 
 	events.call(this);
 	this.address = address;
+	this.html = html;
 }
 
 // Inherit the methods of "events".
@@ -91,60 +92,74 @@ Scraper.prototype.scrape = function(callback){
 		this.on("image", callback);
 	}
 
-	var parsedUrl = url.parse(this.address);
+	if (this.html && this.address) {
+		// I'm no longer making the http request here. I'll just pass in the full html
+		// that was returned from `puppeteer`.
 
-	// Make a reference to the current instance.
-	var ref = this;
+		this.html.replace(/<img[\S\s]*?>/ig, function(m){
 
-	// Support HTTPS.
-	var protocol = http;
-	if(parsedUrl.protocol == "https:") {
-		protocol = https;
-	}
+			var image = new Image(cheerio.load(m)("img")[0], ref.address);
 
-	parsedUrl.headers = {
-		'User-Agent': 'javascript'
-	};
+			ref.emit("image", image);
+		});
 
-	var request = protocol.request(parsedUrl, function(response){
+		ref.emit("end");
+	} else {
+		var parsedUrl = url.parse(this.address);
 
-		if(response.statusCode != 200){
-			console.error("Image scraper(1): web page couldn't be found. (statusCode:" + response.statusCode + ")");
-			ref.emit("end");
-			request.end();
-			return process.exit(1);
+		// Make a reference to the current instance.
+		var ref = this;
+
+		// Support HTTPS.
+		var protocol = http;
+		if(parsedUrl.protocol == "https:") {
+			protocol = https;
 		}
-		else{
 
-			response.setEncoding("utf8");
+		parsedUrl.headers = {
+			'User-Agent': 'javascript'
+		};
 
-			var previous = "",
-				current;
+		var request = protocol.request(parsedUrl, function(response){
 
-			response.on("data", function(data){
-				var current = previous + data;
+			if(response.statusCode != 200){
+				console.error("Image scraper(1): web page couldn't be found. (statusCode:" + response.statusCode + ")");
+				ref.emit("end");
+				request.end();
+				return process.exit(1);
+			}
+			else{
 
-				current.replace(/<img[\S\s]*?>/ig, function(m){
+				response.setEncoding("utf8");
 
-					var image = new Image(cheerio.load(m)("img")[0], ref.address);
+				var previous = "",
+					current;
 
-					ref.emit("image", image);
+				response.on("data", function(data){
+					var current = previous + data;
+
+					current.replace(/<img[\S\s]*?>/ig, function(m){
+
+						var image = new Image(cheerio.load(m)("img")[0], ref.address);
+
+						ref.emit("image", image);
+					});
+
+					previous = data;
 				});
 
-				previous = data;
-			});
+				response.on("end", function(){
+					ref.emit("end");
+				});
+			}
+		});
+		request.end();
 
-			response.on("end", function(){
-				ref.emit("end");
-			});
-		}
-	});
-	request.end();
+		request.on("error", function(e){
 
-	request.on("error", function(e){
-
-		console.error("Image scraper(2): error while loading web page: " + e + ".");
-	});
+			console.error("Image scraper(2): error while loading web page: " + e + ".");
+		});
+	}
 };
 
 module.exports = Scraper;
