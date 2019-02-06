@@ -145,6 +145,24 @@ Scraper.prototype.scrape = function(callback){
 						ref.emit("image", image);
 					});
 
+					// This is specific to https://www.theatlas.com/. If these custom scenarios keep growing we should
+					// make a separate file for custom rules/behaviors.
+					if (parsedUrl.href.indexOf('theatlas') !== -1) {
+						current.replace(/<a[\S\s]*?>/ig, function(m){
+	
+							let cheerObj = cheerio.load(m)('a')[0];
+
+							if ('download' in cheerObj.attribs) {
+								let newSrc = parsedUrl.protocol + '//' + parsedUrl.host + cheerObj.attribs.href;
+								cheerObj.attribs['src'] = newSrc;
+
+								let image = new Image(cheerObj, ref.address);
+
+								ref.emit("image", image);
+							}
+						});
+					}
+
 					previous = data;
 				});
 
