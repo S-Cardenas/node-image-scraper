@@ -153,7 +153,8 @@ Scraper.prototype.scrape = function(callback){
 							let cheerObj = cheerio.load(m)('a')[0];
 
 							if ('download' in cheerObj.attribs) {
-								let newSrc = parsedUrl.protocol + '//' + parsedUrl.host + cheerObj.attribs.href;
+								// let newSrc = parsedUrl.protocol + '//' + parsedUrl.host + cheerObj.attribs.href;
+								let newSrc = cheerObj.attribs.href;
 								cheerObj.attribs['src'] = newSrc;
 
 								let image = new Image(cheerObj, ref.address);
