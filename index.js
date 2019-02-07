@@ -15,6 +15,9 @@ function Image(image, address){
 	try {
 		var at = this.attributes = image.attribs;
 
+		// For some reason the src is coming in with addiional double quotes. Let's clean this string up.
+		at.src = at.src.replace(/"/g,"");
+
 		this.name = path.basename(at.src, path.extname(at.src));
 		this.saveTo = path.dirname(require.main.filename) + "/";
 		this.extension = path.extname(at.src);
