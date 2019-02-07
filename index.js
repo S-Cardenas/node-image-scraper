@@ -20,6 +20,8 @@ function Image(image, address){
 		this.extension = path.extname(at.src);
 		this.address = url.resolve(address, at.src);
 		this.fromAddress = address;
+
+		console.log('Final Image Objec: ', this);
 	} catch(e) {
 		console.error("Image scraper(5): image image item couldn't be built. Error message: ", e, e.stack);
 	}
@@ -153,9 +155,11 @@ Scraper.prototype.scrape = function(callback){
 							let cheerObj = cheerio.load(m)('a')[0];
 
 							if ('download' in cheerObj.attribs) {
-								// let newSrc = parsedUrl.protocol + '//' + parsedUrl.host + cheerObj.attribs.href;
 								let newSrc = cheerObj.attribs.href;
 								cheerObj.attribs['src'] = newSrc;
+								console.log('THIS IS A DOWNLOAD LINK!!');
+								console.log('newSrc: ', newSrc);
+
 
 								let image = new Image(cheerObj, ref.address);
 
