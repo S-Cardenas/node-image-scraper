@@ -11,11 +11,10 @@ var cheerio = require("cheerio");
 
 // The "Image" class.
 function Image(image, address){
-
 	try {
 		var at = this.attributes = image.attribs;
 
-		// For some reason the src is coming in with addiional double quotes. Let's clean this string up.
+		// For some reason the src is coming in with addiional double quotes every once in a while. Let's clean this string up.
 		at.src = at.src.replace(/"/g,"");
 
 		this.name = path.basename(at.src, path.extname(at.src));
@@ -23,8 +22,6 @@ function Image(image, address){
 		this.extension = path.extname(at.src);
 		this.address = url.resolve(address, at.src);
 		this.fromAddress = address;
-
-		console.log('Final Image Objec: ', this);
 	} catch(e) {
 		console.error("Image scraper(5): image image item couldn't be built. Error message: ", e, e.stack);
 	}
@@ -81,7 +78,6 @@ Image.prototype.save = function(callback){
 };
 
 function Scraper(address, html){
-
 	events.call(this);
 	this.address = address;
 	this.html = html;
@@ -160,9 +156,6 @@ Scraper.prototype.scrape = function(callback){
 							if ('download' in cheerObj.attribs) {
 								let newSrc = cheerObj.attribs.href;
 								cheerObj.attribs['src'] = newSrc;
-								console.log('THIS IS A DOWNLOAD LINK!!');
-								console.log('newSrc: ', newSrc);
-
 
 								let image = new Image(cheerObj, ref.address);
 
